@@ -15,7 +15,7 @@ class ExemplarMemory(Function):
         self.em = em
         self.alpha = alpha
 
-    def forward(self, inputs, targets):
+    def forwarding(self, inputs, targets):
         self.save_for_backward(inputs, targets)
         outputs = inputs.mm(self.em.t())
         return outputs
@@ -43,7 +43,7 @@ class CAPMemory(nn.Module):
         self.crosscam_epoch = crosscam_epoch
         self.bg_knn = bg_knn
     
-    def forward(self, features, targets, cams=None, epoch=None, all_pseudo_label='',
+    def forwarding(self, features, targets, cams=None, epoch=None, all_pseudo_label='',
                 batch_ind=-1, init_intra_id_feat=''):
 
         loss = torch.tensor([0.]).to(device='cuda')
@@ -91,7 +91,7 @@ class CAPMemory(nn.Module):
             # intra-camera loss
             mapped_targets = [self.memory_class_mapper[cc][int(k)] for k in percam_targets]
             mapped_targets = torch.tensor(mapped_targets).to(torch.device('cuda'))
-            percam_inputs = ExemplarMemory(self.percam_memory[cc], alpha=self.alpha)(percam_feat, mapped_targets)
+            percam_inputs = ExemplarMemory(self.percam_memory[cc], alpha=self.alpha).forwarding(percam_feat, mapped_targets)
             percam_inputs /= self.beta  # similarity score before softmax
             loss += F.cross_entropy(percam_inputs, mapped_targets)
 
@@ -112,16 +112,3 @@ class CAPMemory(nn.Module):
                     associate_loss += -1 * (F.log_softmax(concated_input.unsqueeze(0), dim=1) * concated_target.unsqueeze(0)).sum()
                 loss += 0.5 * associate_loss / len(percam_feat)
         return loss
-
-
-
-
-
-
-
-
-
-
-
-
-        

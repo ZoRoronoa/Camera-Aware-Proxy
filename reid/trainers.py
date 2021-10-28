@@ -46,7 +46,7 @@ class Trainer(object):
 
             # Target loss
             _, embed_feat = self.model(inputs_target)
-            loss = self.model_inv(embed_feat, index_target, cam_target, epoch=epoch, all_pseudo_label=all_pseudo_label,
+            loss = self.model_inv.forwarding(embed_feat, index_target, cam_target, epoch=epoch, all_pseudo_label=all_pseudo_label,
                     batch_ind=batch_ind, init_intra_id_feat=init_intra_id_feat)
 
             loss_print['memo_loss'] = loss.item()

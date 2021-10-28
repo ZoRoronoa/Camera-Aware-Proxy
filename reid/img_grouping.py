@@ -16,21 +16,24 @@ def img_association(network, propagate_loader, min_sample=4, eps=0,
     print('Start Inference...')
     features = []
     global_labels = []
+    real_labels = []
     all_cams = []
 
     with torch.no_grad():
         for c, data in enumerate(propagate_loader):
             images = data[0]
+            r_label = data[2]
             g_label = data[3]
             cam = data[4]
-
+            images = images.to(torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
             embed_feat = network(images)
             features.append(embed_feat.cpu())
-
+            real_labels.append(r_label)
             global_labels.append(g_label)
             all_cams.append(cam)
 
     features = torch.cat(features, dim=0).numpy()
+    real_labels = torch.cat(real_labels, dim=0).numpy()
     global_labels = torch.cat(global_labels, dim=0).numpy()
     all_cams = torch.cat(all_cams, dim=0).numpy()
     print('  features: shape= {}'.format(features.shape))
@@ -58,6 +61,7 @@ def img_association(network, propagate_loader, min_sample=4, eps=0,
     # self-similarity for association
     print('  perform image grouping...')
     _, updated_label = dbscan(W, eps=eps, min_samples=min_sample, metric='precomputed', n_jobs=8)
+    # updated_label = real_labels
     print('  eps in cluster: {:.3f}'.format(eps))
     print('  updated_label: num_class= {}, {}/{} images are associated.'
           .format(updated_label.max() + 1, len(updated_label[updated_label >= 0]), len(updated_label)))

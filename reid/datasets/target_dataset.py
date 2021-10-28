@@ -29,10 +29,13 @@ class DA(object):
 
     def set_cam_dict(self):
         cam_dict = {}
-        cam_dict['Market1501'] = 6
-        cam_dict['DukeMTMC-reID'] = 8
-        cam_dict['MSMT17'] = 15
+        cam_dict['market1501'] = 6
+        cam_dict['dukemtmcreid'] = 8
+        cam_dict['MSMT17_V1'] = 15
         cam_dict['VeRi'] = 20
+        cam_dict['sysu-mm01'] = 6
+        cam_dict['sysu-mm01-cam-1'] = 1
+        cam_dict['sysu-mm01-cam-2'] = 2
         return cam_dict
 
     def preprocess(self, images_dir, path, relabel=True):

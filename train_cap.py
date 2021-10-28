@@ -211,7 +211,8 @@ def main(args):
     cap_memory = CAPMemory(beta=args.inv_beta, alpha=args.inv_alpha, all_img_cams=dataset.target_train_all_img_cams)
 
     # Set model
-    model = nn.DataParallel(model.to(device))
+    # model = nn.DataParallel(model.to(device))
+    model = model.to(device)
     cap_memory = cap_memory.to(device)
 
     # Load from checkpoint
@@ -269,11 +270,13 @@ def main(args):
                             init_intra_id_feat=init_intra_id_feat)
 
         # test
-        if (epoch+1)%10 == 0:
-            print('Test with epoch {} model:'.format(epoch))
-            eval_results = test_model(model, query_loader, gallery_loader)
-            print('    rank1: %.4f, rank5: %.4f, rank10: %.4f, rank20: %.4f, mAP: %.4f'
-                 % (eval_results[1], eval_results[2], eval_results[3], eval_results[4], eval_results[0]))
+        if (epoch+1)%5 == 0:
+            torch.save(model.state_dict(), osp.join(args.logs_dir, 'final_model_epoch_'+str(epoch+1)+'.pth'))
+            print('Epoch' + str(epoch + 1)+ ' Model saved.')
+            # print('Test with epoch {} model:'.format(epoch))
+            # eval_results = test_model(model, query_loader, gallery_loader)
+            # print('    rank1: %.4f, rank5: %.4f, rank10: %.4f, rank20: %.4f, mAP: %.4f'
+            #      % (eval_results[1], eval_results[2], eval_results[3], eval_results[4], eval_results[0]))
 
         # save final model
         if (epoch+1)%args.epochs == 0:
